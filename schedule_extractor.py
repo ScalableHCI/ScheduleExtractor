@@ -35,7 +35,7 @@ def fetch_and_clean_html(url):
 
         # Wrap cleaned table in a div for embedding
         embedded_html = f"""
-        <div class="embedded-table">
+        <div class="embedded-table" style="font-size: 10px;">
             {str(table)}
         </div>
         """
