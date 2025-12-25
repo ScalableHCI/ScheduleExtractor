@@ -40,6 +40,17 @@ def fetch_and_clean_html(url):
             first_row_cells = new_rows[0].find_all('td')
             for cell in first_row_cells:
                 cell.name = 'th'  # Changing <td> to <th> makes them bold by default
+                
+                # Check for Saturday or Sunday and make them non-bold
+                cell_text = cell.get_text().lower()
+                if 'saturday' in cell_text or 'sunday' in cell_text:
+                    cell['style'] = 'font-weight: normal;'
+
+        # Add light grey background to all non-empty content cells (td)
+        for cell in table.find_all('td'):
+            if cell.get_text(strip=True):
+                # Use a very light grey (lighter than typical grey headers)
+                cell['style'] = 'background-color: #f9f9f9;'
 
         # ----------------------------------------------------------------------
         #  Clean up links of the form: https://www.google.com/url?q=<REAL_URL>
@@ -93,11 +104,11 @@ def fetch_and_clean_html(url):
         </div>
         """
 
-        # Make it more readable by beautifying the output
-        pretty_html = BeautifulSoup(embedded_html, 'html.parser').prettify()
-
         # Return the final HTML code to be embedded
-        return pretty_html
+        # Note: We do NOT use prettify() here because it inserts whitespace/newlines
+        # inside inline tags (like <span> or <a>), which browsers render as extra spaces,
+        # breaking the layout for underlined text.
+        return embedded_html
 
     except requests.RequestException as e:
         print(f"An error occurred while fetching the URL: {e}")
@@ -105,7 +116,7 @@ def fetch_and_clean_html(url):
         print(e)
 
 # Specify the Google Spreadsheet URL
-url = "https://docs.google.com/spreadsheets/d/e/2PACX-1vTxsgHgwYvaL4LOQxegbICkNCY0zdnDUtYf65eP47HgHcXqDlaGcexyVkLmJ9-0DgO30ILlymkp7YVF/pubhtml?gid=2136832740&single=true"
+url = "https://docs.google.com/spreadsheets/d/e/2PACX-1vTnx18GETNacxTfJJyL8tU5w8_6zeiCmxoT0vcHrAgjbd6FEzTfmnORq_pl_f4-wUMWVawYa09IO_Et/pubhtml/sheet?headers=false&gid=85355365"
 
 # Get the cleaned HTML code to embed
 html_code = fetch_and_clean_html(url)
